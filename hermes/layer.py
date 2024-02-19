@@ -3,7 +3,7 @@ import random
 from hermes.storage import Storage
 from hermes.agent import Agent
 
-class Layer:
+class TransactionLayer:
     """
     Transaction Layer
 

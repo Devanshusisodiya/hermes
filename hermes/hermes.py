@@ -1,8 +1,8 @@
 from hermes.storage import Storage
-from hermes.layer import Layer
+from hermes.layer import TransactionLayer
 
 # initialising an agents storage 
 storage = Storage()
 
 # initialising a communication layer
-layer = Layer(storage=storage)
+layer = TransactionLayer(storage=storage)
