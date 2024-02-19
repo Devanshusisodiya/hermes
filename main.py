@@ -8,4 +8,4 @@ layer.register(a1)
 layer.register(a2)
 
 # sending the message from agent a1 to agent a2
-a1.comm(layer, a2, "message from a1")
+a1.talk(layer, a2, "message from a1")

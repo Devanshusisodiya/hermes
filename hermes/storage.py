@@ -12,7 +12,7 @@ class Storage:
             directory = {}
             pkl.dump(directory, f)
 
-    async def update_directory(self, agent: Agent) -> bool:
+    async def add_agent(self, agent: Agent) -> bool:
         """
         function to update the agent directory
         """
@@ -34,10 +34,21 @@ class Storage:
 
         return agent_exists
     
-    def access_directory(self) -> Dict:
+    async def update_directory(self, agent: Agent, message: str) -> None:
+        with open(self.agents_path, "rb") as f:
+            directory = pkl.load(f)
+        
+        # updating the agent messages
+        directory[agent.name].messages.append(message)
+
+        with open(self.agents_path, "wb") as f:
+            pkl.dump(directory, f)
+
+    def agent_reference(self, agent: Agent) -> Dict:
         """
         function to access the agent directory
         """
         with open(self.agents_path, "rb") as f:
             directory = pkl.load(f)
-        return directory
+
+        return directory[agent.name]

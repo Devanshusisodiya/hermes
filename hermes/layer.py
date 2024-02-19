@@ -9,7 +9,7 @@ class Layer:
         self.storage = storage
 
     async def _transact_storage(self, agent: Agent) -> bool:
-        res = await self.storage.update_directory(agent=agent)
+        res = await self.storage.add_agent(agent=agent)
         return res
     
     def register(self, agent: Agent):
@@ -22,21 +22,23 @@ class Layer:
         else:
             print("agent already registered")
 
-    async def _send_async(self, agent: Agent, message: str):
+    async def _send_async(self, agent: Agent, message: str) -> bool:
         """
         coroutine to send message to an agent registered on the net
         """
-        directory = self.storage.access_directory()
+        agent_reference = self.storage.agent_reference(agent)
         print(f"message : {message} sent")
 
-        # this sleep here represents actual network latency
-        # when a message will be sent
+        # this sleep here represents actual network latency when a message will be sent
         await asyncio.sleep(random.randint(1, 6))
-        
-        resp = await directory[agent.name].recv(message)
+
+        resp = await agent_reference.listen(message)
+        if resp:
+            await self.storage.update_directory(agent, message)
+
         return resp
     
-    async def _send_batch(self):
+    async def _send_batch(self) -> None:
         """
         couroutine to send messages to an agent in batch concurrently
         """
@@ -47,7 +49,7 @@ class Layer:
 
     def send(self, recipient: Agent, message: str) -> None:
         """
-        function to 
+        function to send the message
         """
         self.pending[recipient] = message
         asyncio.run(self._send_batch())
