@@ -4,6 +4,13 @@ from typing import Dict
 from hermes.agent import Agent
 
 class Storage:
+    """
+    Storage
+
+    This class implements the Storage layer in Hermes.
+    It contains methods that allow manipulation of the agent directory.
+    """
+    
     def __init__(self) -> None:
         # uncomment to maintain a persistent agent storage
         # if "agents.pkl" not in os.listdir(os.getcwd()):
@@ -14,7 +21,13 @@ class Storage:
 
     async def add_agent(self, agent: Agent) -> bool:
         """
-        function to update the agent directory
+        Returns the whether an agent exists after adding it to the network
+
+            Parameters:
+                    agent (Agent): An agent instance
+
+            Returns:
+                    agent_exists (bool): A boolean
         """
         with open(self.agents_path, "rb") as f:
             directory = pkl.load(f)
@@ -27,28 +40,44 @@ class Storage:
             agent_exists = True
         else:
             print(f"Agent {agent.name} already exists on the network!!!")
-            # raise Exception("Agent already exists on the network!!!")
             
         with open(self.agents_path, "wb") as f:
             pkl.dump(directory, f)
 
         return agent_exists
     
-    async def update_directory(self, agent: Agent, message: str) -> None:
+    async def update_directory(self, agent_name: str, message: str) -> None:
+        """
+        Updates the agent directory for the agent specified with the message
+
+            Parameters:
+                    agent (Agent): An agent instance
+                    message (str): A message string
+
+            Returns:
+                    None
+        """
         with open(self.agents_path, "rb") as f:
             directory = pkl.load(f)
         
         # updating the agent messages
-        directory[agent.name].messages.append(message)
+        directory[agent_name].messages.append(message)
 
         with open(self.agents_path, "wb") as f:
             pkl.dump(directory, f)
 
-    def agent_reference(self, agent: Agent) -> Dict:
+    def agent_reference(self, agent_name: str) -> Agent:
         """
-        function to access the agent directory
+        Returns the storage reference of the agent object from the agent directory
+
+            Parameters:
+                    agent_name (str): Name of the agent
+
+            Returns:
+                    agent (Agent): Agent object
         """
         with open(self.agents_path, "rb") as f:
             directory = pkl.load(f)
 
-        return directory[agent.name]
+        agent = directory[agent_name]
+        return agent
