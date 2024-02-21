@@ -1,8 +1,4 @@
-from hermes.storage import Storage
-from hermes.layer import TransactionLayer
-
-# initialising an agents storage 
-storage = Storage()
+from hermes.multiplexer import MultiPlexer
 
 # initialising a communication layer
-layer = TransactionLayer(storage=storage)
+multiplexer = MultiPlexer()

@@ -1,3 +1,5 @@
+import asyncio
+
 class Agent:
     """
     Agent
@@ -9,17 +11,21 @@ class Agent:
     def __init__(self, name: str) -> None:
         self.name = name
         self.messages = []
+        self.active = True
     
-    def talk(self, layer, agent_name: str, message: str):
+    async def talk(self, multiplexer, agent_name: str, message: str):
         """
         function to send a message
         """
-        layer.send(agent_name, message)
+        # put a message on the event loop queue
+        # then call a connective function from layer to pass the loop
+        await multiplexer.schedule(agent_name, message)
+        print("sent")
 
-    def notify(self) -> None:
-        print("a message is received!")
+    async def write(self, message: str):
+        self.messages.append(message)
 
-    async def listen(self, message: str) -> bool:
+    async def listen(self) -> str:
         """
         Function to listen for messages
 
@@ -28,9 +34,21 @@ class Agent:
             Returns:
                     bool: A boolean to represent if a valid message was received
         """
-        if message:
-            self.notify()
-            self.messages.append(message)
-            return True
-        else:
-            return False
+        while not len(self.messages):
+            await asyncio.sleep(0.5)
+        return self.messages.pop(0)
+    
+    async def listen_forever(self):
+        while self.active:
+            res = await self.listen()
+            if res:
+                print(f"[recv]: {res}")
+    
+    async def start(self, multiplexer, agent_name, message):
+        await asyncio.gather(
+            self.listen_forever(),
+            self.talk(multiplexer, agent_name, message)
+        )
+
+    async def run(self, multiplexer, agent_name, message):
+        await self.start(multiplexer, agent_name, message)

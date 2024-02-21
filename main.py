@@ -1,13 +1,34 @@
 from hermes.agent import Agent
-from hermes.hermes import storage, layer
+from hermes.hermes import multiplexer
+import asyncio
+import random
 
-a1 = Agent("a1")
-a2 = Agent("a2")
 
-layer.register(a1)
-layer.register(a2)
+async def recv_handler(message):
+    print("[recv] : {}".format(message))
+    return False
 
-# sending the message from agent a1 to agent a2
-# the only the name is passed because an agent can be existing
-# in a different namespace, and the communication can be done with name alone
-a1.talk(layer, "a2", "message from a1")
+async def send_handler(message):
+    print("[sent] : {}".format(message))
+    return False
+
+
+async def main():
+
+    a1 = Agent("a1")
+    a2 = Agent("a2")
+
+    await multiplexer.register(a1)
+    await multiplexer.register(a2)
+
+    try:
+        await asyncio.gather(
+            a1.run(multiplexer, a2.name, "from a1"),
+            a2.run(multiplexer, a1.name, "from a2"),
+            multiplexer.run()
+        )
+    except KeyboardInterrupt:
+        pass
+
+if __name__ == "__main__":
+    asyncio.run(main())
