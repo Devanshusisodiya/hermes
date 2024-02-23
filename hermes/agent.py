@@ -1,4 +1,10 @@
-class Agent:
+import asyncio
+import random
+import hashlib
+from hermes.agent_base import AgentBase
+from hermes.multiplexer import MultiPlexer
+
+class Agent(AgentBase):
     """
     Agent
 
@@ -7,19 +13,41 @@ class Agent:
     """
 
     def __init__(self, name: str) -> None:
-        self.name = name
-        self.messages = []
+        self._hash = hashlib.sha256(bytes(name, "utf-8")).hexdigest()
+        self._messages = []
+        self._active = True
     
-    def talk(self, layer, agent_name: str, message: str):
+    async def talk(self, multiplexer: MultiPlexer) -> None:
         """
-        function to send a message
+        Function to talk to other agents
+
+            Parameters:
+                    multiplexer (Multiplexer): The multiplexer instance
+            Returns:
+                    None
         """
-        layer.send(agent_name, message)
+        if self._active:
+            _message = random.randint(1, 100)
+            await multiplexer.schedule(self._hash, _message)
+            print(f"[sndr][{self._hash}]: {_message}")
 
-    def notify(self) -> None:
-        print("a message is received!")
+    async def write(self, message: str):
+        self._messages.append(message)
 
-    async def listen(self, message: str) -> bool:
+    async def _get_message(self) -> str:
+        """
+        Function to check if messages is populated and returns it
+
+            Parameters:
+                    None
+            Returns:
+                    str: Message that is sent to the agent
+        """
+        while not len(self._messages):
+            await asyncio.sleep(0.5)
+        return self._messages.pop(0)
+
+    async def _listen(self):
         """
         Function to listen for messages
 
@@ -28,9 +56,24 @@ class Agent:
             Returns:
                     bool: A boolean to represent if a valid message was received
         """
-        if message:
-            self.notify()
-            self.messages.append(message)
-            return True
-        else:
-            return False
+        while self._active:
+            res = await self._get_message()
+            if res:
+                print(f"[recv][{self._hash}]: {res}")
+
+    async def _start(self, multiplexer):
+        await asyncio.gather(
+            self._listen(),
+            self.talk(multiplexer)
+        )
+
+    async def run(self, multiplexer):
+        """
+        Function to talk to other agents
+
+            Parameters:
+                    multiplexer (Multiplexer): The multiplexer instance
+            Returns:
+                    None
+        """
+        await self._start(multiplexer)
