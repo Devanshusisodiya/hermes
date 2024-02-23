@@ -1,6 +1,10 @@
 import asyncio
+import random
+import hashlib
+from hermes.agent_base import AgentBase
+from hermes.multiplexer import MultiPlexer
 
-class Agent:
+class Agent(AgentBase):
     """
     Agent
 
@@ -9,23 +13,41 @@ class Agent:
     """
 
     def __init__(self, name: str) -> None:
-        self.name = name
-        self.messages = []
-        self.active = True
+        self._hash = hashlib.sha256(bytes(name, "utf-8")).hexdigest()
+        self._messages = []
+        self._active = True
     
-    async def talk(self, multiplexer, agent_name: str, message: str):
+    async def talk(self, multiplexer: MultiPlexer) -> None:
         """
-        function to send a message
+        Function to talk to other agents
+
+            Parameters:
+                    multiplexer (Multiplexer): The multiplexer instance
+            Returns:
+                    None
         """
-        # put a message on the event loop queue
-        # then call a connective function from layer to pass the loop
-        await multiplexer.schedule(agent_name, message)
-        print("sent")
+        if self._active:
+            _message = random.randint(1, 100)
+            await multiplexer.schedule(self._hash, _message)
+            print(f"[sndr][{self._hash}]: {_message}")
 
     async def write(self, message: str):
-        self.messages.append(message)
+        self._messages.append(message)
 
-    async def listen(self) -> str:
+    async def _get_message(self) -> str:
+        """
+        Function to check if messages is populated and returns it
+
+            Parameters:
+                    None
+            Returns:
+                    str: Message that is sent to the agent
+        """
+        while not len(self._messages):
+            await asyncio.sleep(0.5)
+        return self._messages.pop(0)
+
+    async def _listen(self):
         """
         Function to listen for messages
 
@@ -34,21 +56,24 @@ class Agent:
             Returns:
                     bool: A boolean to represent if a valid message was received
         """
-        while not len(self.messages):
-            await asyncio.sleep(0.5)
-        return self.messages.pop(0)
-    
-    async def listen_forever(self):
-        while self.active:
-            res = await self.listen()
+        while self._active:
+            res = await self._get_message()
             if res:
-                print(f"[recv]: {res}")
-    
-    async def start(self, multiplexer, agent_name, message):
+                print(f"[recv][{self._hash}]: {res}")
+
+    async def _start(self, multiplexer):
         await asyncio.gather(
-            self.listen_forever(),
-            self.talk(multiplexer, agent_name, message)
+            self._listen(),
+            self.talk(multiplexer)
         )
 
-    async def run(self, multiplexer, agent_name, message):
-        await self.start(multiplexer, agent_name, message)
+    async def run(self, multiplexer):
+        """
+        Function to talk to other agents
+
+            Parameters:
+                    multiplexer (Multiplexer): The multiplexer instance
+            Returns:
+                    None
+        """
+        await self._start(multiplexer)
