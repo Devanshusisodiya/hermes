@@ -1,5 +1,6 @@
 import asyncio
 from hermes.agent_base import AgentBase
+import random
 
 class MultiPlexer:
     """
@@ -59,6 +60,9 @@ class MultiPlexer:
             for agent_hash in self._agents:
                 agent = self._agents[agent_hash]
                 if agent_hash != sender_hash:
+                    # simulating actual different network latencies 
+                    # to contact agents on the network
+                    await asyncio.sleep(random.randint(1, 10))
                     await agent.write(message)
     
     async def _gather_runners(self):
