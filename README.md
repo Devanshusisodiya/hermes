@@ -14,6 +14,22 @@ Under the hood, the multiplexer uses the following architecture.
 The aggregator function is invoked which puts up the messages on the multiplexer messsage bus (async. queue) when an agent makes contact, and the scheduler function which is running constantly consumes the messages
 put on message bus and sends them to the agents registered on the network.
 
+An agent can be defined and registered on the multiplexer as follows
+
+```python
+awesome_agent = Agent("awesome_agent")
+
+await multiplexer.register(awesome_agent)
+```
+
+And finally the mutiplexer is to be run
+
+```python
+await multiplexer.run()
+```
+
+A sample driver code is defined in `main.py`. 
+
 ### This idea can be evolved
 
 From a broader perspective, this environment can be evolved to use multiple _P2P_ hosts that use **Hermes** package (which under the hood will use sockets to make public remote connections) to run agents.
