@@ -62,10 +62,7 @@ class Agent(AgentBase):
                 print(f"[recv][{self.hash}]: {res}")
 
     async def _start(self, multiplexer):
-        await asyncio.gather(
-            self._listen(),
-            self.talk(multiplexer)
-        )
+        await asyncio.gather(self._listen(), self.talk(multiplexer))
 
     async def run(self, multiplexer):
         """

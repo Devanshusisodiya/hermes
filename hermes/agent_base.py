@@ -9,6 +9,7 @@ class AgentBase:
 
     This is the base class to implement Agents in Hermes.
     """
+
     def __init__(self, name: str) -> None:
         self.hash: str = hashlib.sha256(bytes(name, "utf-8")).hexdigest()
         self.messages: T.List[T.Dict[str, str]] = []

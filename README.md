@@ -28,8 +28,8 @@ And finally the mutiplexer is to be run
 await multiplexer.run()
 ```
 
-A sample driver code is defined in `main.py`. 
+A sample driver code is defined in `main.py`.
 
-### This idea can be evolved
+## This idea can be evolved
 
 From a broader perspective, this environment can be evolved to use multiple _P2P_ hosts that use **Hermes** package (which under the hood will use sockets to make public remote connections) to run agents.

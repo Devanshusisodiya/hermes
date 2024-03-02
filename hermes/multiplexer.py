@@ -47,12 +47,7 @@ class MultiPlexer:
         Returns:
                 None
         """
-        await self._queue.put(
-            {
-                "sender": agenthash,
-                "message": message
-            }
-        )
+        await self._queue.put({"sender": agenthash, "message": message})
 
     async def _send(self):
         while True:
@@ -69,12 +64,8 @@ class MultiPlexer:
                     await agent.write(message)
 
     async def _gather_runners(self):
-        _runners = [
-            agent.run(self) for agent in self._agents.values()
-        ] + [self._send()]
-        await asyncio.gather(
-            *_runners
-        )
+        _runners = [agent.run(self) for agent in self._agents.values()]
+        await asyncio.gather(*_runners, self._send())
 
     async def run(self):
         await self._gather_runners()

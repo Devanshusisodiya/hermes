@@ -1,6 +1,6 @@
 *venv
 .venv
-*pycache*
 *pkl
 storage_access.py
 *tox
+*cache*

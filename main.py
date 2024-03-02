@@ -1,6 +1,8 @@
+import asyncio
+
 from hermes.agent import Agent
 from hermes.hermes import multiplexer
-import asyncio
+
 
 async def main():
 
@@ -17,9 +19,8 @@ async def main():
     # trying to register already registered agent
     await multiplexer.register(a3)
 
-    await asyncio.gather(
-        multiplexer.run()
-    )
+    await asyncio.gather(multiplexer.run())
+
 
 if __name__ == "__main__":
     try:
