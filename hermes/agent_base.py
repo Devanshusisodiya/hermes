@@ -13,7 +13,7 @@ class AgentBase:
     """
 
     def __init__(self, name: str) -> None:
-        """init"""
+        """Initialize hash"""
         self.hash: str = hashlib.sha256(bytes(name, "utf-8")).hexdigest()
 
     @abstractmethod
