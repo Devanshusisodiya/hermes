@@ -1,3 +1,5 @@
+"""Agent concrete implementation"""
+
 import asyncio
 import random
 import typing as T
@@ -16,6 +18,8 @@ class Agent(AgentBase):
 
     def __init__(self, name: str) -> None:
         super().__init__(name)
+        self.messages: T.List[T.Dict[str, str]] = []
+        self.active: bool = True
 
     async def talk(self, multiplexer: MultiPlexer) -> None:
         """
@@ -31,7 +35,7 @@ class Agent(AgentBase):
             await multiplexer.schedule(self.hash, _message)
             print(f"[sndr][{self.hash}]: {_message}")
 
-    async def write(self, message: T.Dict[str, str]):
+    async def write(self, message: T.Dict[str, str]) -> None:
         self.messages.append(message)
 
     async def _get_message(self) -> T.Dict[str, str]:
@@ -43,7 +47,7 @@ class Agent(AgentBase):
         Returns:
                 str: Message that is sent to the agent
         """
-        while not len(self.messages):
+        while not self.messages:
             await asyncio.sleep(0.5)
         return self.messages.pop(0)
 
@@ -61,10 +65,7 @@ class Agent(AgentBase):
             if res:
                 print(f"[recv][{self.hash}]: {res}")
 
-    async def _start(self, multiplexer):
-        await asyncio.gather(self._listen(), self.talk(multiplexer))
-
-    async def run(self, multiplexer):
+    async def run(self, multiplexer: MultiPlexer) -> None:
         """
         Function to talk to other agents
 
@@ -73,4 +74,4 @@ class Agent(AgentBase):
         Returns:
                 None
         """
-        await self._start(multiplexer)
+        await asyncio.gather(self._listen(), self.talk(multiplexer))

@@ -9,5 +9,5 @@ type-check:
 
 .PHONY: format
 format:
-	tox -e clean-imports
-	# tox -e 
+	tox -e isort
+	tox -e black

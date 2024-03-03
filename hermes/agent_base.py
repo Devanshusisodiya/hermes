@@ -1,3 +1,5 @@
+"""AgentBase module"""
+
 import hashlib
 import typing as T
 from abc import abstractmethod
@@ -11,14 +13,18 @@ class AgentBase:
     """
 
     def __init__(self, name: str) -> None:
+        """init"""
         self.hash: str = hashlib.sha256(bytes(name, "utf-8")).hexdigest()
-        self.messages: T.List[T.Dict[str, str]] = []
-        self.active: bool = True
 
     @abstractmethod
-    async def write(self, message: T.Dict[str, str]):
-        pass
+    async def write(self, message: T.Dict[str, str]) -> None:
+        """
+        Abstract method to write to the messages
+        list of the agent
+        """
 
     @abstractmethod
-    async def run(self):
-        pass
+    async def run(self, multiplexer) -> None:
+        """
+        Abstract method to run the agent
+        """

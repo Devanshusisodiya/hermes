@@ -1,7 +1,7 @@
 import asyncio
 
 from hermes.agent import Agent
-from hermes.hermes import multiplexer
+from hermes.multiplexer import MultiPlexer
 
 
 async def main():
@@ -10,6 +10,9 @@ async def main():
     a2 = Agent("a2")
     a3 = Agent("a3")
     a4 = Agent("a4")
+
+    # initialising the multiplexer layer
+    multiplexer = MultiPlexer()
 
     await multiplexer.register(a1)
     await multiplexer.register(a2)

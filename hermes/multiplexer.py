@@ -1,3 +1,5 @@
+"""Multiplexer module"""
+
 import asyncio
 import random
 import typing as T
@@ -55,8 +57,7 @@ class MultiPlexer:
             senderhash = message["sender"]
 
             # send message to every agent but itself
-            for agenthash in self._agents:
-                agent = self._agents[agenthash]
+            for agenthash, agent in self._agents.items():
                 if agenthash != senderhash:
                     # simulating actual different network latencies
                     # to contact agents on the network
@@ -68,5 +69,8 @@ class MultiPlexer:
         await asyncio.gather(*_runners, self._send())
 
     async def run(self):
+        """
+        Runs the multiplexer
+        """
         await self._gather_runners()
         return
